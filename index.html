@@ -98,47 +98,44 @@
       <div class="modal-header-bar"><span id="modal-title">TASK_CONFIGURATION_V7.0</span><span class="pixel-close" onclick="closeModal()">[X]</span></div>
       <form id="issueForm" class="modal-body">
         <input type="hidden" id="edit-id">
+        
         <div class="field-grid-73">
-          <div class="field-item"><label class="pixel-label label-dark-green">Issue (問題名稱)</label><input type="text" id="input-issue" class="pixel-input wide highlight-font" required></div>
+          <div class="field-item"><label class="pixel-label label-dark-green">Issue (任務名稱)</label><input type="text" id="input-issue" class="pixel-input wide highlight-font" required></div>
           <div class="field-item"><label class="pixel-label label-dark-green">建立日期</label><input type="text" id="input-created-date" class="pixel-input wide" readonly style="opacity:0.6;"></div>
         </div>
-        <div class="field-grid">
-             <div class="field-item"><label class="pixel-label label-dark-green">建立者</label><input type="text" id="input-creator" class="pixel-input wide" readonly style="opacity:0.7; color:var(--pixel-green);"></div>
-             <div class="field-item"></div>
-        </div>
+
         <div class="field-grid-4">
           <div class="field-item"><label class="pixel-label label-dark-green">Owner</label><select id="input-owner" class="pixel-input" required></select></div>
           <div class="field-item"><label class="pixel-label label-dark-green">Status</label><select id="input-status" class="pixel-input" onchange="handleStatusChange()" required></select></div>
           <div class="field-item"><label class="pixel-label label-dark-green">客戶別</label><select id="input-customer" class="pixel-input" required></select></div>
-          <div class="field-item"><label class="pixel-label label-dark-green">產品別</label><select id="input-product" class="pixel-input" required></select></div>
-        </div>
-        <div class="field-grid">
           <div class="field-item"><label class="pixel-label label-dark-green">專案別</label><select id="input-project" class="pixel-input" required></select></div>
-          <div class="field-item"><label class="pixel-label label-dark-green">預計結案日</label><input type="date" id="input-deadline" class="pixel-input date-picker-custom" required></div>
         </div>
-        <div class="field-grid-4">
-          <div class="field-item" style="grid-column: span 2;">
+
+        <div class="field-grid">
+          <div class="field-item"><label class="pixel-label label-dark-green">預計完成日</label><input type="date" id="input-deadline" class="pixel-input date-picker-custom" required></div>
+          <div class="field-item">
             <label class="pixel-label label-dark-green">優先級</label>
             <select id="input-priority" class="pixel-input" required>
               <option value="1_高">高</option><option value="2_一般">一般</option><option value="3_低">低</option>
             </select>
           </div>
-          <div class="field-item" style="grid-column: span 2;"><label class="pixel-label label-dark-green">實際結案日</label><input type="date" id="input-actual-closed" class="pixel-input date-picker-custom" readonly style="opacity:0.5; background:rgba(255,255,255,0.05);"></div>
         </div>
-        
+
         <div class="field-grid">
-          <div class="field-item"><label class="pixel-label label-dark-green">問題描述</label><textarea id="input-description" class="pixel-input scroll" rows="6" required></textarea></div>
+          <div class="field-item"><label class="pixel-label label-dark-green">任務描述</label><textarea id="input-description" class="pixel-input scroll" rows="10" required></textarea></div>
           <div class="field-item">
             <label class="pixel-label label-dark-green">項目紀錄 <button type="button" class="mini-plus-btn" onclick="addRecordItem()">[+]</button></label>
-            <div id="records-container" class="scroll" style="height: 150px; overflow-y: auto; border: 2px solid #285428; padding: 10px; background: rgba(0,0,0,0.3);"></div>
+            <div id="records-container" class="scroll" style="height: 220px; overflow-y: auto; border: 2px solid #285428; padding: 10px; background: rgba(0,0,0,0.3);"></div>
           </div>
         </div>
-        <div class="field-full">
-          <label class="pixel-label label-dark-green">相關檔案連結 (選填)</label>
-          <div id="link-group"><input type="text" class="pixel-input wide link-entry" placeholder="https://..."></div>
+
+        <div class="field-grid">
+           <div class="field-item"><label class="pixel-label label-dark-green">實際結案日</label><input type="date" id="input-actual-closed" class="pixel-input date-picker-custom" readonly style="opacity:0.5;"></div>
+           <div class="field-item"><label class="pixel-label label-dark-green">相關檔案連結</label><div id="link-group"><input type="text" class="pixel-input link-entry" placeholder="https://..."></div></div>
         </div>
-        <div class="modal-footer">
-          <button type="button" id="btn-delete" class="pixel-btn" style="display:none; background:#ff0055; color:#fff; border-color:#ff0055;" onclick="deleteIssue()">[ 刪除紀錄 ]</button>
+
+        <div class="modal-footer" style="display: flex; justify-content: space-between; width: 100%; padding-top: 20px;">
+          <button type="button" id="btn-delete" class="pixel-btn" style="display:none; background:#ff0055; color:#fff;" onclick="deleteIssue()">[ 刪除 ]</button>
           <div style="display: flex; gap: 10px; margin-left: auto;">
             <button type="button" class="pixel-btn btn-secondary" onclick="closeModal()">取消</button>
             <button type="button" id="submit-btn" class="pixel-btn btn-primary" onclick="submitIssue()">建立完成</button>
