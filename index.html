@@ -3,56 +3,52 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>技術服務部 - 問題解決分析庫</title>
-  
+  <title>設備研發部 - 問題解決分析庫</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="pixel-bg">
+  <div class="watermark">GENIIDEAS</div>
 
   <div id="login-overlay">
     <div class="pixel-box login-card">
-      <div class="pixel-title">SECURITY_ACCESS - 問題解決分析庫</div>
-      <p class="pixel-text">請輸入人員識別碼與密碼以登入系統</p>
-      <input type="text" id="login-user" class="pixel-input" placeholder="人員識別碼 (ID)..." style="margin-bottom:10px;">
-      <input type="password" id="login-pwd" class="pixel-input" placeholder="密碼...">
-      <button class="pixel-btn btn-primary" onclick="handleLogin()" style="margin-top:15px; width:100%;">驗證啟動</button>
+      <div class="pixel-title">SECURITY_ACCESS</div>
+      <p class="pixel-text">問題解決分析庫 - 請輸入人員帳密</p>
+      <input type="text" id="login-user" class="pixel-input" placeholder="USER ID...">
+      <input type="password" id="login-pwd" class="pixel-input" placeholder="PASSWORD..." style="margin-top:10px;">
+      <button class="pixel-btn btn-primary" onclick="handleLogin()" style="margin-top:20px; width:100%;">驗證啟動</button>
     </div>
   </div>
 
   <div id="main-ui" style="display:none;">
     <header>
-        <h1 class="pixel-h1">技術服務部 - 問題解決分析庫</h1>
-        <div class="user-display">USER: <span id="current-username-display">UNKNOWN</span></div>
+      <h1 class="pixel-h1">設備研發部 - 問題解決分析庫</h1>
+      <div class="user-display">USER: <span id="current-username-display">UNKNOWN</span></div>
     </header>
 
     <div class="layout-container">
       <nav class="sidebar pixel-border">
         <button class="nav-btn" id="btn-tab-main" onclick="switchTab('tab-main')" style="display:none;">儀表板<br><small>(Dashboard)</small></button>
         <button class="nav-btn active" id="btn-tab-issues" onclick="switchTab('tab-issues')">問題資料庫<br><small>(Issues)</small></button>
-        <button class="nav-btn" id="btn-tab-manager" onclick="switchTab('tab-manager')" style="display:none; color: #ff0055;">主管事務管理<br><small>(Manager)</small></button>
+        <button class="nav-btn" id="btn-tab-manager" onclick="switchTab('tab-manager')" style="display:none; color: #ff0055;">主管事務</button>
         <div style="flex:1"></div>
-        <button class="nav-btn" onclick="location.reload()" style="background:#444; border-color:#fff; color:#fff; font-size:12px; padding:10px 5px;">中斷同步<br>(Logout)</button>
+        <button class="nav-btn logout-btn" onclick="location.reload()">登出</button>
       </nav>
 
       <main class="main-content">
-        
         <div id="tab-main" class="tab-section" style="display:none;">
           <div class="stats-container pixel-border">
             <div class="stats-header-wrap">
-              <h2 class="pixel-h1" style="font-size:20px; color: var(--pixel-green); margin:0;">人員任務統計</h2>
-              
+              <h2 class="pixel-h1" style="font-size:18px; color: var(--pixel-green);">任務統計分析</h2>
               <div class="stats-controls">
-                <div class="month-filter">
-                  <span style="color:var(--pixel-green); font-size:14px;">建立區間:</span>
-                  <input type="month" id="stats-month-start" class="pixel-input date-picker-custom" onchange="renderStats()">
-                  <span style="color:#fff;">~</span>
-                  <input type="month" id="stats-month-end" class="pixel-input date-picker-custom" onchange="renderStats()">
-                  <button type="button" class="pixel-btn btn-secondary" style="padding: 8px; font-size:12px; border-width: 2px;" onclick="document.getElementById('stats-month-start').value=''; document.getElementById('stats-month-end').value=''; renderStats();">清除</button>
+                <div class="date-range-picker">
+                  <input type="date" id="stats-date-start" class="pixel-input" onchange="renderStats()">
+                  <span>~</span>
+                  <input type="date" id="stats-date-end" class="pixel-input" onchange="renderStats()">
                 </div>
-                <div class="custom-select" style="min-width: 160px;">
-                  <div id="stats-status-text" class="select-selected pixel-input" style="padding: 8px 12px; font-size: 14px;" onclick="toggleDropdown('stats-status', event)">狀態: 全狀態 ▾</div>
-                  <div class="select-items pixel-border" id="stats-status" style="display:none;"></div>
+                <div class="custom-select">
+                  <div id="stats-product-text" class="select-selected pixel-input" onclick="toggleDropdown('stats-product', event)">產品篩選 ▾</div>
+                  <div class="select-items pixel-border" id="stats-product" style="display:none;"></div>
                 </div>
               </div>
             </div>
@@ -62,78 +58,60 @@
 
         <div id="tab-issues" class="tab-section">
           <div class="control-panel pixel-border">
-            <input type="text" id="search-input" class="pixel-input" placeholder="搜尋問題關鍵字..." oninput="renderIssues()">
+            <input type="text" id="search-input" class="pixel-input mini-search" placeholder="關鍵字..." oninput="renderIssues()">
             <div class="filter-group">
               <div class="custom-select"><div class="select-selected pixel-input" onclick="toggleDropdown('items-owner', event)">負責人 ▾</div><div class="select-items pixel-border" id="items-owner" style="display:none;"></div></div>
-              <div class="custom-select"><div class="select-selected pixel-input" onclick="toggleDropdown('items-status', event)">狀態 ▾</div><div class="select-items pixel-border" id="items-status" style="display:none;"></div></div>
-              <div class="custom-select"><div class="select-selected pixel-input" onclick="toggleDropdown('items-customer', event)">客戶別 ▾</div><div class="select-items pixel-border" id="items-customer" style="display:none;"></div></div>
+              <div class="custom-select"><div class="select-selected pixel-input" onclick="toggleDropdown('items-product', event)">產品別 ▾</div><div class="select-items pixel-border" id="items-product" style="display:none;"></div></div>
+              <div class="custom-select"><div class="select-selected pixel-input" onclick="toggleDropdown('items-project', event)">專案別 ▾</div><div class="select-items pixel-border" id="items-project" style="display:none;"></div></div>
             </div>
-            <button class="pixel-btn btn-add" style="line-height: 1.4;" onclick="openModal('TS')">+ 新增<br>問題</button>
+            <button class="pixel-btn btn-add" onclick="openModal('TS')">+ 新增</button>
           </div>
           <div class="todo-grid" id="issue-display"></div>
         </div>
 
         <div id="tab-manager" class="tab-section" style="display:none;">
-          <div class="control-panel pixel-border" style="border-color: #ff0055;">
-            <input type="text" id="search-input-mgr" class="pixel-input" placeholder="搜尋主管事務..." oninput="renderManagerIssues()">
-            <div class="filter-group">
-              <div class="custom-select"><div class="select-selected pixel-input" onclick="toggleDropdown('items-status-mgr', event)">狀態 ▾</div><div class="select-items pixel-border" id="items-status-mgr" style="display:none;"></div></div>
-              <div class="custom-select"><div class="select-selected pixel-input" onclick="toggleDropdown('items-customer-mgr', event)">客戶別 ▾</div><div class="select-items pixel-border" id="items-customer-mgr" style="display:none;"></div></div>
+            <div class="control-panel pixel-border" style="border-color: #ff0055;">
+              <input type="text" id="search-input-mgr" class="pixel-input" placeholder="搜尋主管事務..." oninput="renderManagerIssues()">
+              <button class="pixel-btn btn-add" style="background:#ff0055; border-color:#ff0055;" onclick="openModal('MGR')">+ 新增</button>
             </div>
-            <button class="pixel-btn btn-add" style="line-height: 1.4; background:#ff0055; border-color:#ff0055;" onclick="openModal('MGR')">+ 新增<br>事務</button>
-          </div>
-          <div class="todo-grid" id="manager-issue-display"></div>
+            <div class="todo-grid" id="manager-issue-display"></div>
         </div>
-
       </main>
     </div>
   </div>
 
   <div id="modal-overlay" class="modal-overlay">
-    <div class="pixel-modal navy-theme">
-      <div class="modal-header-bar"><span id="modal-title">TASK_CONFIGURATION_V7.0</span><span class="pixel-close" onclick="closeModal()">[X]</span></div>
+    <div class="pixel-modal">
+      <div class="modal-header-bar"><span id="modal-title">EDIT_RECORD</span><span class="pixel-close" onclick="closeModal()">[X]</span></div>
       <form id="issueForm" class="modal-body">
         <input type="hidden" id="edit-id">
-        <div class="field-grid-73">
-          <div class="field-item"><label class="pixel-label">Issue (問題描述)</label><input type="text" id="input-issue" class="pixel-input wide highlight-font" required></div>
-          <div class="field-item"><label class="pixel-label">建立日期</label><input type="text" id="input-created-date" class="pixel-input wide" readonly style="opacity:0.6;" required></div>
+        <div class="field-grid">
+          <div class="field-item"><label class="pixel-label">問題名稱</label><input type="text" id="input-issue" class="pixel-input" required></div>
+          <div class="field-item"><label class="pixel-label">建立者</label><input type="text" id="input-creator" class="pixel-input" readonly></div>
         </div>
-        <div class="field-grid-creator">
-             <div class="field-item"><label class="pixel-label">建立者 (吃目前使用者)</label><input type="text" id="input-creator" class="pixel-input wide" readonly style="opacity:0.7; color:var(--pixel-green);"></div>
-        </div>
-
         <div class="field-grid-4">
           <div class="field-item"><label class="pixel-label">Owner</label><select id="input-owner" class="pixel-input" required></select></div>
-          <div class="field-item"><label class="pixel-label">Status</label><select id="input-status" class="pixel-input" required></select></div>
+          <div class="field-item"><label class="pixel-label">Status</label><select id="input-status" class="pixel-input" onchange="handleStatusChange()" required></select></div>
           <div class="field-item"><label class="pixel-label">客戶別</label><select id="input-customer" class="pixel-input" required></select></div>
-          <div class="field-item"><label class="pixel-label">產品別 (巨集 D 欄)</label><select id="input-product" class="pixel-input" required></select></div>
+          <div class="field-item"><label class="pixel-label">產品別</label><select id="input-product" class="pixel-input" required></select></div>
         </div>
         <div class="field-grid">
-          <div class="field-item"><label class="pixel-label">專案別 (巨集 E 欄)</label><select id="input-project" class="pixel-input" required></select></div>
-          <div class="field-item"><label class="pixel-label">預計解決日</label><input type="date" id="input-deadline" class="pixel-input date-picker-custom" required></div>
+          <div class="field-item"><label class="pixel-label">專案別</label><select id="input-project" class="pixel-input" required></select></div>
+          <div class="field-item"><label class="pixel-label">預計完成日</label><input type="date" id="input-deadline" class="pixel-input" required></div>
         </div>
-        <div class="field-grid">
-          <div class="field-item">
-            <label class="pixel-label">優先級</label>
-            <select id="input-priority" class="pixel-input" required>
-              <option value="" disabled selected>請選擇...</option><option value="1_高">高</option><option value="2_一般">一般</option><option value="3_低">低</option>
-            </select>
-          </div>
-          <div class="field-item"></div>
+        <div class="field-item"><label class="pixel-label">問題描述</label><textarea id="input-description" class="pixel-input scroll" rows="2"></textarea></div>
+        
+        <div class="field-item">
+          <label class="pixel-label">項目紀錄 <button type="button" class="mini-plus-btn" onclick="addRecordItem()">[+] 新增條目</button></label>
+          <div id="records-container" class="scroll" style="max-height: 200px; overflow-y: auto; padding: 10px; border: 2px dashed #285428;">
+            </div>
         </div>
-        <div class="field-grid">
-          <div class="field-item"><label class="pixel-label">問題細節</label><textarea id="input-description" class="pixel-input scroll" rows="8" required></textarea></div>
-          <div class="field-item"><label class="pixel-label">對策記錄</label><textarea id="input-records" class="pixel-input scroll" rows="8" required></textarea></div>
-        </div>
-        <div class="field-full">
-          <label class="pixel-label">參考資料連結 <button type="button" class="mini-plus-btn" onclick="addLinkField()">[+] 新增</button></label>
-          <div id="link-group"><input type="text" class="pixel-input wide link-entry" placeholder="https://..."></div>
-        </div>
-        <div class="modal-footer" style="display: flex; justify-content: space-between; width: 100%;">
-          <button type="button" id="btn-delete" class="pixel-btn" style="display:none; background:#ff0055; color:#fff; border-color:#ff0055;" onclick="deleteIssue()">[ 刪除專案 ]</button>
-          <div style="display: flex; gap: 10px; margin-left: auto;">
-            <button type="button" class="pixel-btn btn-secondary" onclick="closeModal()">[ 取消 ]</button>
-            <button type="button" id="submit-btn" class="pixel-btn btn-primary" onclick="submitIssue()">[ 建立完成 ]</button>
+
+        <div class="modal-footer" style="display:flex; justify-content: space-between;">
+          <button type="button" id="btn-delete" class="pixel-btn" style="background:#ff0055; display:none;" onclick="deleteIssue()">[ 刪除紀錄 ]</button>
+          <div style="display:flex; gap:10px; margin-left:auto;">
+            <button type="button" class="pixel-btn" onclick="closeModal()">取消</button>
+            <button type="button" id="submit-btn" class="pixel-btn btn-primary" onclick="submitIssue()">建立完成</button>
           </div>
         </div>
       </form>
@@ -141,6 +119,5 @@
   </div>
 
   <script src="script.js"></script>
-
 </body>
 </html>
