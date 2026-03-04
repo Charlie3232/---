@@ -1,4 +1,4 @@
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwx2MaNqRJPhM_6avrcmP0iaiMyAv_fLbKKABg1MZNdmrCzSOKuTVlN437Kl0vmMXqS/exec'; 
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbws3I5VBX9M_496JG_S-3PUHetLY6Gqrd1cM59amITq1LhchlylV9UHmeLEkIJWZRbC/exec'; 
 let allIssues = [];
 let dataConfig = {};
 let isMutating = false; 
@@ -6,7 +6,7 @@ let userList = [];
 let currentUser = { id: "", name: "", role: "" };
 let currentModalType = 'TS';
 
-// 預設今年日期格式化
+// 預設 2026 年日期格式化
 const getToday = () => {
     const d = new Date();
     return `2026-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -24,7 +24,7 @@ function fillFormSelect(id, list) {
 async function handleLogin() {
   const idInput = document.getElementById('login-user').value.trim();
   const pwdInput = document.getElementById('login-pwd').value.trim();
-  if (!idInput || !pwdInput) { alert("請輸入 ID 與密碼"); return; }
+  if (!idInput || !pwdInput) { alert("請輸入識別碼與密碼"); return; }
   if (userList.length === 0) {
       document.getElementById('login-status').innerText = "伺服器同步中...";
       await fetchDataOnLoad();
@@ -40,9 +40,7 @@ async function handleLogin() {
         document.getElementById('btn-tab-manager').style.display = 'block';
     }
     initUI();
-  } else { 
-      alert("驗證失敗：人員識別碼或密碼錯誤"); 
-  }
+  } else { alert("驗證失敗：人員識別碼或密碼錯誤"); }
 }
 
 async function fetchDataOnLoad() {
@@ -94,7 +92,7 @@ function handleStatusChange() {
   const status = document.getElementById('input-status').value;
   const actualField = document.getElementById('input-actual-closed');
   if (status === "已解決" || status === "Done") {
-    const closedDate = prompt("專案完成！請輸入實際結案日期 (YYYY-MM-DD):", getToday());
+    const closedDate = prompt("此項目已完成！請輸入實際結案日期 (YYYY-MM-DD):", getToday());
     if (closedDate) {
       window.currentClosedDate = closedDate;
       actualField.value = closedDate;
@@ -158,27 +156,27 @@ const isTaskUrgent = (deadlineStr, status) => {
   return diffDays <= 2;
 };
 
-// 負責人與產品統計
+// 負責人與產品雙統計
 function renderStats() {
   const start = document.getElementById('stats-date-start').value;
   const end = document.getElementById('stats-date-end').value;
   const colors = ['#0f0', '#ffeb3b', '#ff0055', '#a020f0', '#ff9800', '#00bcd4'];
 
   const filtered = allIssues.filter(i => {
-    if (i.id && i.id.startsWith('MGR-')) return false;
+    if (i.id && String(i.id).startsWith('MGR-')) return false;
     let iDate = i.date ? i.date.replace(/\//g, '-') : "";
     if (start && iDate < start) return false;
     if (end && iDate > end) return false;
     return true;
   });
 
-  // 1. 人員統計
+  // 1. 負責人統計
   const ownerCounts = {}; let ownerTotal = 0;
   filtered.forEach(i => { ownerCounts[i.owner] = (ownerCounts[i.owner] || 0) + 1; ownerTotal++; });
   document.getElementById('stats-bars').innerHTML = Object.keys(ownerCounts).sort((a,b)=>ownerCounts[b]-ownerCounts[a]).map((o, idx) => {
     const pct = ownerTotal ? Math.round(ownerCounts[o]/ownerTotal*100) : 0;
     return `<div class="stat-row"><div class="stat-label">${o}</div><div class="stat-bar-bg"><div class="stat-bar-fill" style="width:${pct}%; background:${colors[idx%colors.length]}"></div><div class="stat-value">${ownerCounts[o]}件 (${pct}%)</div></div></div>`;
-  }).join('') || "無數據";
+  }).join('') || "<p style='text-align:center;'>無負責人數據</p>";
 
   // 2. 產品統計
   const prodCounts = {}; let prodTotal = 0;
@@ -186,7 +184,7 @@ function renderStats() {
   document.getElementById('product-stats-bars').innerHTML = Object.keys(prodCounts).sort((a,b)=>prodCounts[b]-prodCounts[a]).map((p, idx) => {
     const pct = prodTotal ? Math.round(prodCounts[p]/prodTotal*100) : 0;
     return `<div class="stat-row"><div class="stat-label">${p}</div><div class="stat-bar-bg"><div class="stat-bar-fill" style="width:${pct}%; background:${colors[(idx+2)%colors.length]}"></div><div class="stat-value">${prodCounts[p]}件 (${pct}%)</div></div></div>`;
-  }).join('') || "無數據";
+  }).join('') || "<p style='text-align:center;'>無產品數據</p>";
 }
 
 function renderIssues() {
@@ -200,7 +198,7 @@ function renderIssues() {
     (!i.id || !String(i.id).startsWith('MGR-')) && 
     String(i.issue).toLowerCase().includes(search) &&
     (fOwners.length === 0 || fOwners.includes(i.owner)) &&
-    (fStats.length === 0 ? (i.status !== "已解決") : fStats.includes(i.status)) &&
+    (fStats.length === 0 ? (i.status !== "已解決" && i.status !== "Done") : fStats.includes(i.status)) &&
     (fProds.length === 0 || fProds.includes(i.product))
   ).sort((a,b) => {
     const isDoneA = (a.status === "已解決" || a.status === "Done");
@@ -213,12 +211,13 @@ function renderIssues() {
   });
 
   container.innerHTML = filtered.map(i => {
-    const isDone = (i.status === "已解決" || i.status === "Done");
-    const urgentClass = (!isDone && isTaskUrgent(i.deadline, i.status)) ? 'urgent-card' : '';
-    return `<div class="pebble ${isDone ? 'resolved-card' : ''} ${urgentClass}" onclick="openEdit('${i.id}')">
-      <div style="font-size:11px; color:var(--pixel-green); margin-bottom:8px;">[ ${i.status} ]</div>
-      <div style="font-size:20px; margin-bottom:12px; line-height:1.3;">${i.issue}</div>
-      <div style="font-size:12px; opacity:0.6;">${i.owner} | ${i.product}</div>
+    const stat = String(i.status);
+    const isDone = (stat === "已解決" || stat === "Done");
+    const isUrgent = (!isDone && isTaskUrgent(i.deadline, stat));
+    return `<div class="pebble ${isDone ? 'resolved-card' : ''} ${isUrgent ? 'urgent-card' : ''}" onclick="openEdit('${i.id}')">
+      <div style="font-size:11px; color:${isUrgent ? '#ff0055' : 'var(--pixel-green)'};">[ ${stat} ]</div>
+      <div style="font-size:20px; margin:10px 0; line-height:1.3;">${i.issue}</div>
+      <div style="font-size:12px; opacity:0.6;">${i.product} | ${i.owner}</div>
     </div>`;
   }).join('');
 }
@@ -267,7 +266,7 @@ function openEdit(id) {
   document.getElementById('input-priority').value = i.priority;
   document.getElementById('input-deadline').value = i.deadline ? i.deadline.replace(/\//g, '-') : getToday();
   document.getElementById('input-description').value = i.description || "";
-  document.getElementById('input-creator').value = i.creator || 'UNKNOWN';
+  document.getElementById('input-creator').value = i.creator || currentUser.name;
   document.getElementById('input-created-date').value = i.date;
   
   const actual = i.closedDate ? i.closedDate.replace(/\//g, '-') : "";
@@ -304,7 +303,7 @@ async function submitIssue() {
 
   const payload = {
     action: document.getElementById('edit-id').value ? "edit" : "add",
-    id: document.getElementById('edit-id').value || (window.currentModalType === 'MGR' ? 'MGR-' : 'TS-') + Date.now(),
+    id: document.getElementById('edit-id').value || (currentModalType === 'MGR' ? 'MGR-' : 'TS-') + Date.now(),
     issue: document.getElementById('input-issue').value,
     owner: document.getElementById('input-owner').value,
     status: document.getElementById('input-status').value,
@@ -324,7 +323,10 @@ async function submitIssue() {
   try {
     isMutating = true; 
     await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-    isMutating = false; alert("同步成功!"); closeModal(); await fetchDataOnLoad();
+    isMutating = false; 
+    alert("同步成功!");
+    closeModal(); 
+    await fetchDataOnLoad(); 
     renderIssues(); renderManagerIssues(); renderStats();
   } catch(e) { alert("同步失敗"); }
   btn.disabled = false; btn.innerText = oldText;
