@@ -14,7 +14,7 @@
     <div class="pixel-box login-card">
       <div class="pixel-title">SECURITY_ACCESS</div>
       <p class="pixel-text">問題解決分析庫 - 驗證人員識別碼</p>
-      <input type="text" id="login-user" class="pixel-input" placeholder="人員識別碼 (ID)..." style="margin-bottom:15px;">
+      <input type="text" id="login-user" class="pixel-input" placeholder="人員識別碼 (ID)..." style="margin-bottom:10px;">
       <input type="password" id="login-pwd" class="pixel-input security-mask" placeholder="密碼...">
       <button class="pixel-btn btn-primary btn-login-giant" id="login-btn" onclick="handleLogin()">驗證啟動 ➔</button>
       <p id="login-status" style="font-size: 10px; color: #555; margin-top: 15px;">系統初始化中...</p>
@@ -53,7 +53,7 @@
                   <div class="select-items pixel-border" id="stats-product" style="display:none;"></div>
                 </div>
                 <div class="custom-select" style="min-width: 140px;">
-                  <div id="stats-status-text" class="select-selected pixel-input" onclick="toggleDropdown('stats-status', event)">狀態: 全選 ▾</div>
+                  <div id="stats-status-text" class="select-selected pixel-input" style="padding: 8px 12px; font-size: 14px;" onclick="toggleDropdown('stats-status', event)">狀態: 全選 ▾</div>
                   <div class="select-items pixel-border" id="stats-status" style="display:none;"></div>
                 </div>
               </div>
@@ -97,7 +97,7 @@
       <form id="issueForm" class="modal-body">
         <input type="hidden" id="edit-id">
         <div class="field-grid-73">
-          <div class="field-item"><label class="pixel-label">Issue (問題名稱)</label><input type="text" id="input-issue" class="pixel-input wide highlight-font" required></div>
+          <div class="field-item"><label class="pixel-label">Issue (問題描述)</label><input type="text" id="input-issue" class="pixel-input wide highlight-font" required></div>
           <div class="field-item"><label class="pixel-label">建立日期</label><input type="text" id="input-created-date" class="pixel-input wide" readonly style="opacity:0.6;"></div>
         </div>
         <div class="field-grid">
@@ -112,7 +112,7 @@
         </div>
         <div class="field-grid">
           <div class="field-item"><label class="pixel-label">專案別</label><select id="input-project" class="pixel-input" required></select></div>
-          <div class="field-item"><label class="pixel-label">預計完成日</label><input type="date" id="input-deadline" class="pixel-input date-picker-custom" required></div>
+          <div class="field-item"><label class="pixel-label">預計解決日</label><input type="date" id="input-deadline" class="pixel-input date-picker-custom" required></div>
         </div>
         <div class="field-grid">
           <div class="field-item">
@@ -124,7 +124,7 @@
           <div class="field-item"></div>
         </div>
         <div class="field-grid">
-          <div class="field-item"><label class="pixel-label">問題描述</label><textarea id="input-description" class="pixel-input scroll" rows="8"></textarea></div>
+          <div class="field-item"><label class="pixel-label">問題細節描述</label><textarea id="input-description" class="pixel-input scroll" rows="8"></textarea></div>
           <div class="field-item">
             <label class="pixel-label">項目紀錄 <button type="button" class="mini-plus-btn" onclick="addRecordItem()">[+] 新增</button></label>
             <div id="records-container" class="scroll" style="height: 180px; overflow-y: auto; border: 2px solid #285428; padding: 10px; background: rgba(0,0,0,0.3);"></div>
@@ -134,9 +134,9 @@
           <label class="pixel-label">相關檔案連結 <button type="button" class="mini-plus-btn" onclick="addLinkField()">[+] 新增</button></label>
           <div id="link-group"><input type="text" class="pixel-input wide link-entry" placeholder="https://..."></div>
         </div>
-        <div class="modal-footer">
-          <button type="button" id="btn-delete" class="pixel-btn" style="background:#ff0055; border-color: #ff0055; display:none;" onclick="deleteIssue()">[ 刪除紀錄 ]</button>
-          <div style="margin-left:auto; display:flex; gap:10px;">
+        <div class="modal-footer" style="display: flex; justify-content: space-between; width: 100%;">
+          <button type="button" id="btn-delete" class="pixel-btn" style="display:none; background:#ff0055; color:#fff; border-color:#ff0055;" onclick="deleteIssue()">[ 刪除紀錄 ]</button>
+          <div style="display: flex; gap: 10px; margin-left: auto;">
             <button type="button" class="pixel-btn btn-secondary" onclick="closeModal()">取消</button>
             <button type="button" id="submit-btn" class="pixel-btn btn-primary" onclick="submitIssue()">建立完成</button>
           </div>
