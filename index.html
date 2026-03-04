@@ -13,7 +13,7 @@
   <div id="login-overlay">
     <div class="pixel-box login-card">
       <div class="pixel-title">SECURITY_ACCESS</div>
-      <p class="pixel-text">問題解決分析庫 - 請輸入人員識別碼與密碼</p>
+      <p class="pixel-text">問題解決分析庫 - 認證人員識別碼</p>
       <input type="text" id="login-user" class="pixel-input" placeholder="人員識別碼 (ID)..." style="margin-bottom:10px;">
       <input type="password" id="login-pwd" class="pixel-input security-mask" placeholder="密碼...">
       <button class="pixel-btn btn-primary" onclick="handleLogin()" style="margin-top:15px; width:100%;">驗證啟動</button>
@@ -36,7 +36,6 @@
       </nav>
 
       <main class="main-content">
-        
         <div id="tab-main" class="tab-section" style="display:none;">
           <div class="stats-container pixel-border">
             <div class="stats-header-wrap">
@@ -48,12 +47,12 @@
                   <span style="color:#fff;">~</span>
                   <input type="date" id="stats-date-end" class="pixel-input date-picker-custom" onchange="renderStats()">
                 </div>
-                <div class="custom-select">
-                  <div id="stats-product-text" class="select-selected pixel-input" style="padding: 8px 12px; font-size: 14px;" onclick="toggleDropdown('stats-product', event)">產品: 全選 ▾</div>
+                <div class="custom-select" style="min-width: 140px;">
+                  <div id="stats-product-text" class="select-selected pixel-input" onclick="toggleDropdown('stats-product', event)">產品: 全選 ▾</div>
                   <div class="select-items pixel-border" id="stats-product" style="display:none;"></div>
                 </div>
-                <div class="custom-select" style="min-width: 160px;">
-                  <div id="stats-status-text" class="select-selected pixel-input" style="padding: 8px 12px; font-size: 14px;" onclick="toggleDropdown('stats-status', event)">狀態: 全狀態 ▾</div>
+                <div class="custom-select" style="min-width: 140px;">
+                  <div id="stats-status-text" class="select-selected pixel-input" onclick="toggleDropdown('stats-status', event)">狀態: 全選 ▾</div>
                   <div class="select-items pixel-border" id="stats-status" style="display:none;"></div>
                 </div>
               </div>
@@ -87,7 +86,6 @@
           </div>
           <div class="todo-grid" id="manager-issue-display"></div>
         </div>
-
       </main>
     </div>
   </div>
@@ -126,19 +124,19 @@
           <div class="field-item"></div>
         </div>
         <div class="field-grid">
-          <div class="field-item"><label class="pixel-label">問題細節</label><textarea id="input-description" class="pixel-input scroll" rows="8"></textarea></div>
+          <div class="field-item"><label class="pixel-label">問題細節描述</label><textarea id="input-description" class="pixel-input scroll" rows="8"></textarea></div>
           <div class="field-item">
             <label class="pixel-label">項目紀錄 <button type="button" class="mini-plus-btn" onclick="addRecordItem()">[+] 新增</button></label>
             <div id="records-container" class="scroll" style="height: 180px; overflow-y: auto; border: 2px solid #285428; padding: 10px; background: rgba(0,0,0,0.3);"></div>
           </div>
         </div>
         <div class="field-full">
-          <label class="pixel-label">參考資料連結 <button type="button" class="mini-plus-btn" onclick="addLinkField()">[+] 新增</button></label>
+          <label class="pixel-label">相關檔案連結 <button type="button" class="mini-plus-btn" onclick="addLinkField()">[+] 新增</button></label>
           <div id="link-group"><input type="text" class="pixel-input wide link-entry" placeholder="https://..."></div>
         </div>
-        <div class="modal-footer" style="display: flex; justify-content: space-between; width: 100%;">
-          <button type="button" id="btn-delete" class="pixel-btn" style="display:none; background:#ff0055; color:#fff; border-color:#ff0055;" onclick="deleteIssue()">[ 刪除專案 ]</button>
-          <div style="display: flex; gap: 10px; margin-left: auto;">
+        <div class="modal-footer">
+          <button type="button" id="btn-delete" class="pixel-btn" style="background:#ff0055; border-color: #ff0055; display:none;" onclick="deleteIssue()">[ 刪除紀錄 ]</button>
+          <div style="margin-left:auto; display:flex; gap:10px;">
             <button type="button" class="pixel-btn btn-secondary" onclick="closeModal()">取消</button>
             <button type="button" id="submit-btn" class="pixel-btn btn-primary" onclick="submitIssue()">建立完成</button>
           </div>
