@@ -1,10 +1,16 @@
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwMJXPVas-evsQvPE1Va1RPgBXS8NnB6rCbs9dsnnlDTsullsLTWq029waPr6RU1JRf/exec'; 
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwx2MaNqRJPhM_6avrcmP0iaiMyAv_fLbKKABg1MZNdmrCzSOKuTVlN437Kl0vmMXqS/exec'; 
 let allIssues = [];
 let dataConfig = {};
 let isMutating = false; 
 let userList = []; 
 let currentUser = { id: "", name: "", role: "" };
 let currentModalType = 'TS';
+
+// 預設今年日期格式化
+const getToday = () => {
+    const d = new Date();
+    return `2026-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+};
 
 function fillFormSelect(id, list) {
   const el = document.getElementById(id);
@@ -35,8 +41,7 @@ async function handleLogin() {
     }
     initUI();
   } else { 
-      alert("識別碼或密碼錯誤"); 
-      document.getElementById('login-status').innerText = "驗證失敗。";
+      alert("驗證失敗：人員識別碼或密碼錯誤"); 
   }
 }
 
@@ -47,9 +52,7 @@ async function fetchDataOnLoad() {
     allIssues = data.issues || [];
     dataConfig = data.config || {};
     userList = data.users || [];
-    if(document.getElementById('login-status')) {
-        document.getElementById('login-status').innerText = "系統就緒。";
-    }
+    if(document.getElementById('login-status')) document.getElementById('login-status').innerText = "系統就緒。";
   } catch(e) { console.error("Initial load failed", e); }
 }
 window.onload = fetchDataOnLoad;
@@ -89,10 +92,20 @@ function addRecordItem(text = "", checked = false) {
 
 function handleStatusChange() {
   const status = document.getElementById('input-status').value;
+  const actualField = document.getElementById('input-actual-closed');
   if (status === "已解決" || status === "Done") {
-    const closedDate = prompt("此項目已完成！請輸入實際結案日 (YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
-    if (closedDate) window.currentClosedDate = closedDate;
-    else { alert("必須填寫實際結案日期！"); document.getElementById('input-status').value = ""; }
+    const closedDate = prompt("專案完成！請輸入實際結案日期 (YYYY-MM-DD):", getToday());
+    if (closedDate) {
+      window.currentClosedDate = closedDate;
+      actualField.value = closedDate;
+      actualField.style.opacity = "1";
+    } else {
+      document.getElementById('input-status').value = "";
+      actualField.value = "";
+    }
+  } else {
+      actualField.value = "";
+      actualField.style.opacity = "0.5";
   }
 }
 
@@ -101,7 +114,7 @@ function switchTab(tabId) {
   document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
   document.getElementById(tabId).style.display = 'block';
   document.getElementById('btn-' + tabId).classList.add('active');
-  if(tabId === 'tab-main' && currentUser.role === "MANAGER") renderStats();
+  if(tabId === 'tab-main') renderStats();
 }
 
 function toggleDropdown(id, event) {
@@ -123,9 +136,6 @@ function fillUIConfigs() {
   fillCheckboxes('items-owner', 'owners', 'renderIssues()');
   fillCheckboxes('items-status', 'statusList', 'renderIssues()');
   fillCheckboxes('items-product', 'products', 'renderIssues()');
-  fillCheckboxes('items-customer', 'customers', 'renderIssues()');
-  fillCheckboxes('stats-product', 'products', 'renderStats()');
-  fillCheckboxes('stats-status', 'statusList', 'updateStatsStatusText()');
   fillFormSelect('input-owner', 'owners');
   fillFormSelect('input-status', 'statusList');
   fillFormSelect('input-customer', 'customers');
@@ -133,47 +143,50 @@ function fillUIConfigs() {
   fillFormSelect('input-project', 'projects');
 }
 
-function updateStatsStatusText() {
-  const vals = getCheckedValues('stats-status');
-  const txt = document.getElementById('stats-status-text');
-  txt.innerText = vals.length === 0 ? "狀態: 全選 ▾" : `狀態: 已選(${vals.length}) ▾`;
-  renderStats();
-}
-
 const getCheckedValues = (id) => {
   return Array.from(document.querySelectorAll(`#${id} input[type="checkbox"]:checked`)).map(cb => cb.value);
 };
 
+const isTaskUrgent = (deadlineStr, status) => {
+  if (!deadlineStr || status === "已解決" || status === "Done") return false;
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  let dParts = String(deadlineStr).split(/[-/T ]/);
+  if(dParts.length < 3) return false;
+  const deadline = new Date(dParts[0], dParts[1] - 1, dParts[2]);
+  deadline.setHours(0, 0, 0, 0);
+  const diffDays = Math.ceil((deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  return diffDays <= 2;
+};
+
+// 負責人與產品統計
 function renderStats() {
-  const container = document.getElementById('stats-bars');
   const start = document.getElementById('stats-date-start').value;
   const end = document.getElementById('stats-date-end').value;
-  const prods = getCheckedValues('stats-product');
-  const fStats = getCheckedValues('stats-status');
-  const ownerCounts = {}; let total = 0;
+  const colors = ['#0f0', '#ffeb3b', '#ff0055', '#a020f0', '#ff9800', '#00bcd4'];
 
-  allIssues.forEach(i => {
-    if (i.id && i.id.startsWith('MGR-')) return;
-    if (fStats.length > 0 && !fStats.includes(String(i.status))) return;
-    if (prods.length > 0 && !prods.includes(String(i.product))) return;
-    let issueDate = i.date ? i.date.replace(/\//g, '-') : "";
-    if (start && issueDate < start) return;
-    if (end && issueDate > end) return;
-    
-    ownerCounts[i.owner] = (ownerCounts[i.owner] || 0) + 1;
-    total++;
+  const filtered = allIssues.filter(i => {
+    if (i.id && i.id.startsWith('MGR-')) return false;
+    let iDate = i.date ? i.date.replace(/\//g, '-') : "";
+    if (start && iDate < start) return false;
+    if (end && iDate > end) return false;
+    return true;
   });
 
-  if(total === 0) { container.innerHTML = "<p style='text-align:center; padding:20px;'>無符合數據。</p>"; return; }
-  const colors = ['#0f0', '#ffeb3b', '#ff0055', '#a020f0', '#ff9800', '#00bcd4'];
-  container.innerHTML = Object.keys(ownerCounts).sort((a,b)=>ownerCounts[b]-ownerCounts[a]).map((o, idx) => {
-    const pct = Math.round(ownerCounts[o]/total*100);
-    return `<div class="stat-row">
-      <div class="stat-label">${o}</div>
-      <div class="stat-bar-bg"><div class="stat-bar-fill" style="width:${pct}%; background:${colors[idx%colors.length]}"></div>
-      <div class="stat-value">${ownerCounts[o]}件 (${pct}%)</div></div>
-    </div>`;
-  }).join('');
+  // 1. 人員統計
+  const ownerCounts = {}; let ownerTotal = 0;
+  filtered.forEach(i => { ownerCounts[i.owner] = (ownerCounts[i.owner] || 0) + 1; ownerTotal++; });
+  document.getElementById('stats-bars').innerHTML = Object.keys(ownerCounts).sort((a,b)=>ownerCounts[b]-ownerCounts[a]).map((o, idx) => {
+    const pct = ownerTotal ? Math.round(ownerCounts[o]/ownerTotal*100) : 0;
+    return `<div class="stat-row"><div class="stat-label">${o}</div><div class="stat-bar-bg"><div class="stat-bar-fill" style="width:${pct}%; background:${colors[idx%colors.length]}"></div><div class="stat-value">${ownerCounts[o]}件 (${pct}%)</div></div></div>`;
+  }).join('') || "無數據";
+
+  // 2. 產品統計
+  const prodCounts = {}; let prodTotal = 0;
+  filtered.forEach(i => { prodCounts[i.product] = (prodCounts[i.product] || 0) + 1; prodTotal++; });
+  document.getElementById('product-stats-bars').innerHTML = Object.keys(prodCounts).sort((a,b)=>prodCounts[b]-prodCounts[a]).map((p, idx) => {
+    const pct = prodTotal ? Math.round(prodCounts[p]/prodTotal*100) : 0;
+    return `<div class="stat-row"><div class="stat-label">${p}</div><div class="stat-bar-bg"><div class="stat-bar-fill" style="width:${pct}%; background:${colors[(idx+2)%colors.length]}"></div><div class="stat-value">${prodCounts[p]}件 (${pct}%)</div></div></div>`;
+  }).join('') || "無數據";
 }
 
 function renderIssues() {
@@ -189,34 +202,50 @@ function renderIssues() {
     (fOwners.length === 0 || fOwners.includes(i.owner)) &&
     (fStats.length === 0 ? (i.status !== "已解決") : fStats.includes(i.status)) &&
     (fProds.length === 0 || fProds.includes(i.product))
-  ).sort((a,b) => new Date(b.date) - new Date(a.date));
+  ).sort((a,b) => {
+    const isDoneA = (a.status === "已解決" || a.status === "Done");
+    const isDoneB = (b.status === "已解決" || b.status === "Done");
+    if (isDoneA !== isDoneB) return isDoneA ? 1 : -1;
+    const urgentA = isTaskUrgent(a.deadline, a.status);
+    const urgentB = isTaskUrgent(b.deadline, b.status);
+    if (urgentA !== urgentB) return urgentA ? -1 : 1;
+    return new Date(b.date) - new Date(a.date);
+  });
 
-  container.innerHTML = filtered.map(i => `<div class="pebble ${i.status === '已解決' ? 'resolved-card' : ''}" onclick="openEdit('${i.id}')">
-    <div style="font-size:11px; color:var(--pixel-green);">[ ${i.status} ]</div>
-    <div style="font-size:20px; margin:10px 0;">${i.issue}</div>
-    <div style="font-size:12px; opacity:0.6;">${i.product} | ${i.owner}</div>
-  </div>`).join('');
+  container.innerHTML = filtered.map(i => {
+    const isDone = (i.status === "已解決" || i.status === "Done");
+    const urgentClass = (!isDone && isTaskUrgent(i.deadline, i.status)) ? 'urgent-card' : '';
+    return `<div class="pebble ${isDone ? 'resolved-card' : ''} ${urgentClass}" onclick="openEdit('${i.id}')">
+      <div style="font-size:11px; color:var(--pixel-green); margin-bottom:8px;">[ ${i.status} ]</div>
+      <div style="font-size:20px; margin-bottom:12px; line-height:1.3;">${i.issue}</div>
+      <div style="font-size:12px; opacity:0.6;">${i.owner} | ${i.product}</div>
+    </div>`;
+  }).join('');
 }
 
 function renderManagerIssues() {
   const container = document.getElementById('manager-issue-display');
-  const filtered = allIssues.filter(i => i.id && String(i.id).startsWith('MGR-'))
+  const search = document.getElementById('search-input-mgr').value.toLowerCase();
+  let filtered = allIssues.filter(i => i.id && String(i.id).startsWith('MGR-') && String(i.issue).toLowerCase().includes(search))
   .sort((a, b) => new Date(b.date) - new Date(a.date));
+  
   container.innerHTML = filtered.map(i => `<div class="pebble" onclick="openEdit('${i.id}')">
-    <div style="font-size:11px; color:#ff0055;">[ ${i.status} ]</div>
-    <div style="font-size:20px; margin:10px 0;">${i.issue}</div>
+    <div style="font-size:11px; color:#ff0055; margin-bottom:8px;">[ ${i.status} ]</div>
+    <div style="font-size:20px; margin-bottom:10px;">${i.issue}</div>
     <div style="font-size:12px; opacity:0.6;">${i.owner}</div>
   </div>`).join('');
 }
 
 function openModal(type) {
-  currentModalType = type; fillUIConfigs();
-  document.getElementById('edit-id').value = "";
+  window.currentModalType = type; fillUIConfigs();
   document.getElementById('issueForm').reset();
   document.getElementById('records-container').innerHTML = '';
   document.getElementById('link-group').innerHTML = '<input type="text" class="pixel-input wide link-entry" placeholder="https://...">';
   document.getElementById('input-created-date').value = new Date().toLocaleDateString('zh-TW');
-  document.getElementById('input-creator').value = currentUser.name; // 正確讀取當前登入者
+  document.getElementById('input-creator').value = currentUser.name;
+  document.getElementById('input-deadline').value = getToday();
+  document.getElementById('input-actual-closed').value = "";
+  document.getElementById('input-actual-closed').style.opacity = "0.5";
   window.currentClosedDate = ""; addRecordItem();
   document.getElementById('modal-overlay').style.display = 'flex';
   document.getElementById('submit-btn').innerText = "建立完成";
@@ -236,12 +265,15 @@ function openEdit(id) {
   document.getElementById('input-product').value = i.product;
   document.getElementById('input-project').value = i.project;
   document.getElementById('input-priority').value = i.priority;
-  document.getElementById('input-deadline').value = i.deadline ? i.deadline.replace(/\//g, '-') : "";
+  document.getElementById('input-deadline').value = i.deadline ? i.deadline.replace(/\//g, '-') : getToday();
   document.getElementById('input-description').value = i.description || "";
   document.getElementById('input-creator').value = i.creator || 'UNKNOWN';
   document.getElementById('input-created-date').value = i.date;
-  window.currentClosedDate = i.closedDate || "";
-  document.getElementById('submit-btn').innerText = "編輯完成";
+  
+  const actual = i.closedDate ? i.closedDate.replace(/\//g, '-') : "";
+  document.getElementById('input-actual-closed').value = actual;
+  document.getElementById('input-actual-closed').style.opacity = actual ? "1" : "0.5";
+  window.currentClosedDate = actual;
 
   const container = document.getElementById('records-container'); container.innerHTML = '';
   (i.records || "").split('||').forEach(item => { if(item) addRecordItem(item.substring(3), item.startsWith('[v]')); });
@@ -254,6 +286,7 @@ function openEdit(id) {
     linkGroup.appendChild(input);
   });
   if(!linkGroup.innerHTML) addLinkField();
+  document.getElementById('submit-btn').innerText = "編輯完成";
   document.getElementById('btn-delete').style.display = 'inline-block';
 }
 
@@ -271,7 +304,7 @@ async function submitIssue() {
 
   const payload = {
     action: document.getElementById('edit-id').value ? "edit" : "add",
-    id: document.getElementById('edit-id').value || (currentModalType === 'MGR' ? 'MGR-' : 'TS-') + Date.now(),
+    id: document.getElementById('edit-id').value || (window.currentModalType === 'MGR' ? 'MGR-' : 'TS-') + Date.now(),
     issue: document.getElementById('input-issue').value,
     owner: document.getElementById('input-owner').value,
     status: document.getElementById('input-status').value,
@@ -283,7 +316,7 @@ async function submitIssue() {
     description: document.getElementById('input-description').value,
     records: recs, 
     creator: document.getElementById('input-creator').value,
-    closedDate: window.currentClosedDate || "", 
+    closedDate: document.getElementById('input-actual-closed').value || "", 
     date: document.getElementById('input-created-date').value,
     link: Array.from(document.querySelectorAll('.link-entry')).map(el => el.value).filter(v => v).join(' | ')
   };
@@ -291,10 +324,7 @@ async function submitIssue() {
   try {
     isMutating = true; 
     await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-    isMutating = false; 
-    alert("同步成功!");
-    closeModal(); // 修正：不再自動重新載入，僅關閉視窗
-    await fetchDataOnLoad(); // 手動更新本地資料
+    isMutating = false; alert("同步成功!"); closeModal(); await fetchDataOnLoad();
     renderIssues(); renderManagerIssues(); renderStats();
   } catch(e) { alert("同步失敗"); }
   btn.disabled = false; btn.innerText = oldText;
@@ -306,7 +336,7 @@ function addLinkField() {
 }
 function closeModal() { document.getElementById('modal-overlay').style.display = 'none'; }
 async function deleteIssue() {
-  const pwd = prompt("請輸入確認密碼:"); if (pwd !== "13091309" && pwd !== "13321332") return;
+  const pwd = prompt("確認密碼:"); if (pwd !== "13091309" && pwd !== "13321332") return;
   const id = document.getElementById('edit-id').value;
   isMutating = true; await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "delete", id: id }) });
   isMutating = false; closeModal(); await fetchDataOnLoad(); renderIssues();
