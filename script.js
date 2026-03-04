@@ -1,4 +1,4 @@
-const SCRIPT_URL = '你的GAS_URL'; 
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzByMLLdHFcDi3tPNQ3tfeNGpoKF0XtDTkj0MLxWrNpjweB-zRbjSG2KxdunwAzADiE/exec'; 
 let allIssues = [];
 let dataConfig = {};
 let userList = []; 
@@ -151,3 +151,4 @@ function toggleDropdown(id, event) {
     const el = document.getElementById(id);
     el.style.display = el.style.display === 'block' ? 'none' : 'block';
 }
+
