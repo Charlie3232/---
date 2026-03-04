@@ -13,7 +13,7 @@
   <div id="login-overlay">
     <div class="pixel-box login-card">
       <div class="pixel-title">SECURITY_ACCESS</div>
-      <p class="pixel-text">問題解決分析庫 - 請輸入人員識別碼</p>
+      <p class="pixel-text">問題解決分析庫 - 驗證人員識別碼</p>
       <input type="text" id="login-user" class="pixel-input" placeholder="人員識別碼 (ID)..." style="margin-bottom:15px;">
       <input type="password" id="login-pwd" class="pixel-input security-mask" placeholder="密碼...">
       <button class="pixel-btn btn-primary btn-login-giant" id="login-btn" onclick="handleLogin()">驗證啟動 ➔</button>
@@ -40,17 +40,17 @@
         <div id="tab-main" class="tab-section" style="display:none;">
           <div class="stats-container pixel-border">
             <div class="stats-header-wrap">
-              <h2 class="pixel-h1" style="font-size:20px; color: var(--pixel-green); margin:0;">數據分析中心</h2>
+              <h2 class="pixel-h1" style="font-size:20px; color: var(--pixel-green); margin:0;">數據統計中心</h2>
               <div class="stats-controls">
                 <div class="month-filter">
-                  <span style="color:var(--pixel-green); font-size:14px;">區間:</span>
+                  <span style="color:var(--pixel-green); font-size:14px;">建立區間:</span>
                   <input type="date" id="stats-date-start" class="pixel-input date-picker-custom" onchange="renderStats()">
                   <span style="color:#fff;">~</span>
                   <input type="date" id="stats-date-end" class="pixel-input date-picker-custom" onchange="renderStats()">
                 </div>
               </div>
             </div>
-            <h3 class="pixel-label label-dark-green" style="margin-top:20px;">[ 人員任務統計 ]</h3>
+            <h3 class="pixel-label label-dark-green" style="margin-top:20px;">[ 負責人任務統計 ]</h3>
             <div id="stats-bars"></div>
             <h3 class="pixel-label label-dark-green" style="margin-top:40px;">[ 產品類別統計 ]</h3>
             <div id="product-stats-bars"></div>
@@ -87,7 +87,7 @@
       <form id="issueForm" class="modal-body">
         <input type="hidden" id="edit-id">
         <div class="field-grid-73">
-          <div class="field-item"><label class="pixel-label label-dark-green">Issue (問題描述)</label><input type="text" id="input-issue" class="pixel-input wide highlight-font" required></div>
+          <div class="field-item"><label class="pixel-label label-dark-green">Issue (問題名稱)</label><input type="text" id="input-issue" class="pixel-input wide highlight-font" required></div>
           <div class="field-item"><label class="pixel-label label-dark-green">建立日期</label><input type="text" id="input-created-date" class="pixel-input wide" readonly style="opacity:0.6;" required></div>
         </div>
         <div class="field-grid">
@@ -111,12 +111,12 @@
               <option value="1_高">高</option><option value="2_一般">一般</option><option value="3_低">低</option>
             </select>
           </div>
-          <div class="field-item"><label class="pixel-label label-dark-green">實際結案日 (完成時填寫)</label><input type="date" id="input-actual-closed" class="pixel-input date-picker-custom" readonly style="opacity:0.5; background:rgba(255,255,255,0.05);"></div>
+          <div class="field-item"><label class="pixel-label label-dark-green">實際結案日 (L欄)</label><input type="date" id="input-actual-closed" class="pixel-input date-picker-custom" readonly style="opacity:0.5; background:rgba(255,255,255,0.05);"></div>
         </div>
         <div class="field-grid">
-          <div class="field-item"><label class="pixel-label label-dark-green">問題細節</label><textarea id="input-description" class="pixel-input scroll" rows="8" required></textarea></div>
+          <div class="field-item"><label class="pixel-label label-dark-green">任務描述 (J欄)</label><textarea id="input-description" class="pixel-input scroll" rows="8" required></textarea></div>
           <div class="field-item">
-            <label class="pixel-label label-dark-green">項目紀錄 <button type="button" class="mini-plus-btn" onclick="addRecordItem()">[+]</button></label>
+            <label class="pixel-label label-dark-green">事項紀錄 (K欄) <button type="button" class="mini-plus-btn" onclick="addRecordItem()">[+]</button></label>
             <div id="records-container" class="scroll" style="height: 180px; overflow-y: auto; border: 2px solid #285428; padding: 10px; background: rgba(0,0,0,0.3);"></div>
           </div>
         </div>
