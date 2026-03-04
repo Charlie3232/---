@@ -1,88 +1,68 @@
 :root {
-  --pixel-green: #00ff41;
-  --bg-dark: #001100;
-  --bg-panel: rgba(0, 20, 0, 0.9);
-  --border-color: #004400;
-  --anime-red: #ff0055;
+  --main-bg: #fcfaf2; /* 米白大地色 */
+  --accent-brown: #6d4c41;
+  --accent-green: #81a18b;
+  --cute-pink: #f8bbd0;
+  --text-color: #4e342e;
 }
 
-body.matrix-bg {
-  background-color: var(--bg-dark);
-  color: var(--pixel-green);
-  font-family: 'Share Tech Mono', monospace;
+body.kawaii-bg {
+  background-color: var(--main-bg);
+  color: var(--text-color);
+  font-family: 'Zen Maru Gothic', 'Kosugi Maru', sans-serif;
   margin: 0;
-  background-image: linear-gradient(rgba(0, 255, 65, 0.05) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(0, 255, 65, 0.05) 1px, transparent 1px);
-  background-size: 30px 30px;
 }
 
 /* 登入視窗 */
-#login-overlay { position: fixed; inset: 0; background: #000; display: flex; justify-content: center; align-items: center; z-index: 10000; }
-.login-card { padding: 40px; width: 350px; text-align: center; }
+#login-overlay { position: fixed; inset: 0; background: rgba(109, 76, 65, 0.2); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 9999; }
+.cute-card { background: white; padding: 40px; border-radius: 30px; border: 4px solid var(--accent-brown); box-shadow: 10px 10px 0 var(--accent-green); text-align: center; width: 320px; }
+.cute-tag { display: inline-block; background: var(--accent-brown); color: white; padding: 2px 12px; border-radius: 20px; font-size: 12px; margin-bottom: 10px; }
 
-.anime-border {
-  border: 2px solid var(--pixel-green);
-  box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
-  background: var(--bg-panel);
-}
+/* 頂部欄 */
+.kawaii-header { background: white; padding: 15px 40px; border-bottom: 3px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+.user-badge { background: #efebe9; padding: 5px 15px; border-radius: 50px; font-weight: bold; }
+.main-title { font-size: 20px; color: var(--accent-brown); }
 
-.anime-header {
-  padding: 15px 30px;
-  border-bottom: 2px solid var(--pixel-green);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: rgba(0, 30, 0, 0.8);
-}
-
-.user-info-tag {
-  background: var(--pixel-green);
-  color: #000;
-  padding: 4px 15px;
-  font-weight: bold;
-  clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
-}
-
-.status-blink {
-  font-size: 12px;
-  margin-top: 5px;
-  animation: blink 1s infinite;
-}
-@keyframes blink { 50% { opacity: 0; } }
-
-.layout-container { display: flex; height: calc(100vh - 85px); padding: 20px; gap: 20px; }
-.sidebar { width: 200px; display: flex; flex-direction: column; gap: 10px; padding: 15px; }
+/* 主佈局 */
+.layout-container { display: flex; padding: 25px; gap: 25px; height: calc(100vh - 80px); box-sizing: border-box; }
+.sidebar { width: 180px; display: flex; flex-direction: column; gap: 12px; }
 
 .nav-btn {
-  background: transparent;
-  color: var(--pixel-green);
-  border: 1px solid var(--pixel-green);
-  padding: 12px;
-  cursor: pointer;
-  text-align: left;
-  transition: 0.3s;
+  background: white; border: 2px solid #ddd; padding: 12px; border-radius: 15px; cursor: pointer;
+  font-family: inherit; font-weight: bold; color: #777; transition: 0.2s;
 }
-.nav-btn:hover, .nav-btn.active { background: var(--pixel-green); color: #000; }
+.nav-btn.active { border-color: var(--accent-green); color: var(--accent-green); background: #f1f8e9; }
+.nav-btn:hover { transform: scale(1.05); }
 
+/* 輸入與按鈕 */
+.cute-input {
+  width: 100%; border: 2px solid #eee; border-radius: 12px; padding: 10px; box-sizing: border-box;
+  font-family: inherit; font-size: 14px; outline: none; background: #fafafa;
+}
+.cute-input:focus { border-color: var(--accent-green); background: white; }
+
+.cute-btn {
+  padding: 10px 20px; border: none; border-radius: 15px; cursor: pointer; font-family: inherit; font-weight: bold; transition: 0.2s;
+}
+.btn-main { background: var(--accent-brown); color: white; }
+.btn-add { background: var(--accent-green); color: white; }
+.btn-del { background: #ef9a9a; color: white; }
+.cute-btn:active { transform: translateY(3px); }
+
+/* 內容區 */
 .main-content { flex: 1; overflow-y: auto; }
-.pixel-input {
-  background: #000;
-  border: 1px solid var(--pixel-green);
-  color: var(--pixel-green);
-  padding: 10px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.todo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.todo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
 .pebble {
-  border: 1px solid var(--pixel-green);
-  padding: 20px;
-  background: rgba(0, 40, 0, 0.4);
-  cursor: pointer;
+  background: white; border-radius: 20px; padding: 20px; border: 2px solid #f3f3f3;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.02); transition: 0.3s;
 }
-.pebble:hover { background: rgba(0, 255, 65, 0.1); }
+.pebble:hover { border-color: var(--accent-green); box-shadow: 0 8px 25px rgba(0,0,0,0.05); }
 
-.pixel-modal { width: 90vw; height: 90vh; border: 2px solid var(--pixel-green); background: var(--bg-dark); }
-.modal-header-bar { background: var(--pixel-green); color: #000; padding: 10px 20px; display: flex; justify-content: space-between; }
-.modal-body { padding: 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+/* 彈出視窗 */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); display: none; justify-content: center; align-items: center; z-index: 1000; }
+.cute-modal { background: white; width: 900px; max-width: 95vw; border-radius: 30px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.1); }
+.modal-header { background: #fcfaf2; padding: 20px 30px; border-bottom: 2px solid #f1f1f1; display: flex; justify-content: space-between; font-weight: bold; }
+.modal-body { padding: 30px; display: flex; flex-direction: column; gap: 20px; max-height: 80vh; overflow-y: auto; }
+.field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.field-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+.cute-label { font-size: 13px; color: #888; margin-bottom: 6px; display: block; }
