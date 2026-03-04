@@ -13,7 +13,7 @@
   <div id="login-overlay">
     <div class="pixel-box login-card">
       <div class="pixel-title">SECURITY_ACCESS</div>
-      <p class="pixel-text">問題解決分析庫 - 驗證人員識別碼</p>
+      <p class="pixel-text">問題解決分析庫 - 請輸入人員識別碼</p>
       <input type="text" id="login-user" class="pixel-input" placeholder="人員識別碼 (ID)..." style="margin-bottom:15px;">
       <input type="password" id="login-pwd" class="pixel-input security-mask" placeholder="密碼...">
       <button class="pixel-btn btn-primary btn-login-giant" id="login-btn" onclick="handleLogin()">驗證啟動 ➔</button>
@@ -40,25 +40,20 @@
         <div id="tab-main" class="tab-section" style="display:none;">
           <div class="stats-container pixel-border">
             <div class="stats-header-wrap">
-              <h2 class="pixel-h1" style="font-size:20px; color: var(--pixel-green); margin:0;">人員任務統計</h2>
+              <h2 class="pixel-h1" style="font-size:20px; color: var(--pixel-green); margin:0;">數據分析中心</h2>
               <div class="stats-controls">
                 <div class="month-filter">
-                  <span style="color:var(--pixel-green); font-size:14px;">建立區間:</span>
+                  <span style="color:var(--pixel-green); font-size:14px;">區間:</span>
                   <input type="date" id="stats-date-start" class="pixel-input date-picker-custom" onchange="renderStats()">
                   <span style="color:#fff;">~</span>
                   <input type="date" id="stats-date-end" class="pixel-input date-picker-custom" onchange="renderStats()">
                 </div>
-                <div class="custom-select" style="min-width: 140px;">
-                  <div id="stats-product-text" class="select-selected pixel-input" onclick="toggleDropdown('stats-product', event)">產品: 全選 ▾</div>
-                  <div class="select-items pixel-border" id="stats-product" style="display:none;"></div>
-                </div>
-                <div class="custom-select" style="min-width: 140px;">
-                  <div id="stats-status-text" class="select-selected pixel-input" onclick="toggleDropdown('stats-status', event)">狀態: 全選 ▾</div>
-                  <div class="select-items pixel-border" id="stats-status" style="display:none;"></div>
-                </div>
               </div>
             </div>
+            <h3 class="pixel-label label-dark-green" style="margin-top:20px;">[ 人員任務統計 ]</h3>
             <div id="stats-bars"></div>
+            <h3 class="pixel-label label-dark-green" style="margin-top:40px;">[ 產品類別統計 ]</h3>
+            <div id="product-stats-bars"></div>
           </div>
         </div>
 
@@ -69,7 +64,7 @@
               <div class="custom-select"><div class="select-selected pixel-input" onclick="toggleDropdown('items-owner', event)">負責人 ▾</div><div class="select-items pixel-border" id="items-owner" style="display:none;"></div></div>
               <div class="custom-select"><div class="select-selected pixel-input" onclick="toggleDropdown('items-status', event)">狀態 ▾</div><div class="select-items pixel-border" id="items-status" style="display:none;"></div></div>
               <div class="custom-select"><div class="select-selected pixel-input" onclick="toggleDropdown('items-product', event)">產品別 ▾</div><div class="select-items pixel-border" id="items-product" style="display:none;"></div></div>
-              </div>
+            </div>
             <button class="pixel-btn btn-add" style="line-height: 1.4;" onclick="openModal('TS')">+ 新增</button>
           </div>
           <div class="todo-grid" id="issue-display"></div>
@@ -77,7 +72,7 @@
 
         <div id="tab-manager" class="tab-section" style="display:none;">
           <div class="control-panel pixel-border" style="border-color: #ff0055;">
-            <input type="text" id="search-input-mgr" class="pixel-input mini-search" placeholder="關鍵字..." oninput="renderManagerIssues()">
+            <input type="text" id="search-input-mgr" class="pixel-input mini-search" placeholder="搜尋主管事務..." oninput="renderManagerIssues()">
             <button class="pixel-btn btn-add" style="line-height: 1.4; background:#ff0055; border-color:#ff0055;" onclick="openModal('MGR')">+ 新增</button>
           </div>
           <div class="todo-grid" id="manager-issue-display"></div>
@@ -116,17 +111,17 @@
               <option value="1_高">高</option><option value="2_一般">一般</option><option value="3_低">低</option>
             </select>
           </div>
-          <div class="field-item"></div>
+          <div class="field-item"><label class="pixel-label label-dark-green">實際結案日 (完成時填寫)</label><input type="date" id="input-actual-closed" class="pixel-input date-picker-custom" readonly style="opacity:0.5; background:rgba(255,255,255,0.05);"></div>
         </div>
         <div class="field-grid">
-          <div class="field-item"><label class="pixel-label label-dark-green">問題細節描述</label><textarea id="input-description" class="pixel-input scroll" rows="8" required></textarea></div>
+          <div class="field-item"><label class="pixel-label label-dark-green">問題細節</label><textarea id="input-description" class="pixel-input scroll" rows="8" required></textarea></div>
           <div class="field-item">
-            <label class="pixel-label label-dark-green">項目紀錄 <button type="button" class="mini-plus-btn" onclick="addRecordItem()">[+] 新增</button></label>
+            <label class="pixel-label label-dark-green">項目紀錄 <button type="button" class="mini-plus-btn" onclick="addRecordItem()">[+]</button></label>
             <div id="records-container" class="scroll" style="height: 180px; overflow-y: auto; border: 2px solid #285428; padding: 10px; background: rgba(0,0,0,0.3);"></div>
           </div>
         </div>
         <div class="field-full">
-          <label class="pixel-label label-dark-green">相關檔案連結 <button type="button" class="mini-plus-btn" onclick="addLinkField()">[+] 新增</button></label>
+          <label class="pixel-label label-dark-green">相關檔案連結</label>
           <div id="link-group"><input type="text" class="pixel-input wide link-entry" placeholder="https://..."></div>
         </div>
         <div class="modal-footer" style="display: flex; justify-content: space-between; width: 100%;">
