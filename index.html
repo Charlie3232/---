@@ -71,9 +71,14 @@
         </div>
 
         <div id="tab-manager" class="tab-section" style="display:none;">
-          <div class="control-panel pixel-border" style="border-color: #ff0055;">
-            <input type="text" id="search-input-mgr" class="pixel-input mini-search" placeholder="搜尋主管事務..." oninput="renderManagerIssues()">
-            <button class="pixel-btn btn-add" style="line-height: 1.4; background:#ff0055; border-color:#ff0055;" onclick="openModal('MGR')">+ 新增</button>
+          <div class="control-panel pixel-border panel-manager">
+            <input type="text" id="search-input-mgr" class="pixel-input mini-search" placeholder="關鍵字..." oninput="renderManagerIssues()">
+            <div class="filter-group">
+              <div class="custom-select"><div class="select-selected pixel-input" onclick="toggleDropdown('mgr-owner', event)">負責人 ▾</div><div class="select-items pixel-border" id="mgr-owner" style="display:none;"></div></div>
+              <div class="custom-select"><div class="select-selected pixel-input" onclick="toggleDropdown('mgr-status', event)">狀態 ▾</div><div class="select-items pixel-border" id="mgr-status" style="display:none;"></div></div>
+              <div class="custom-select"><div class="select-selected pixel-input" onclick="toggleDropdown('mgr-product', event)">產品別 ▾</div><div class="select-items pixel-border" id="mgr-product" style="display:none;"></div></div>
+            </div>
+            <button class="pixel-btn btn-add btn-manager-pink" onclick="openModal('MGR')">+ 新增</button>
           </div>
           <div class="todo-grid" id="manager-issue-display"></div>
         </div>
@@ -82,12 +87,12 @@
   </div>
 
   <div id="modal-overlay" class="modal-overlay">
-    <div class="pixel-modal navy-theme">
+    <div class="pixel-modal navy-theme" id="modal-container">
       <div class="modal-header-bar"><span id="modal-title">TASK_CONFIGURATION_V7.0</span><span class="pixel-close" onclick="closeModal()">[X]</span></div>
       <form id="issueForm" class="modal-body">
         <input type="hidden" id="edit-id">
         <div class="field-grid-73">
-          <div class="field-item"><label class="pixel-label label-dark-green">Issue (問題名稱)</label><input type="text" id="input-issue" class="pixel-input wide highlight-font" required></div>
+          <div class="field-item"><label class="pixel-label label-dark-green">問題名稱 (Issue)</label><input type="text" id="input-issue" class="pixel-input wide highlight-font" required></div>
           <div class="field-item"><label class="pixel-label label-dark-green">建立日期</label><input type="text" id="input-created-date" class="pixel-input wide" readonly style="opacity:0.6;" required></div>
         </div>
         <div class="field-grid">
@@ -104,20 +109,20 @@
           <div class="field-item"><label class="pixel-label label-dark-green">專案別</label><select id="input-project" class="pixel-input" required></select></div>
           <div class="field-item"><label class="pixel-label label-dark-green">預計結案日</label><input type="date" id="input-deadline" class="pixel-input date-picker-custom" required></div>
         </div>
-        <div class="field-grid">
+        <div class="field-grid" style="margin-bottom: 20px;">
           <div class="field-item">
             <label class="pixel-label label-dark-green">優先級</label>
             <select id="input-priority" class="pixel-input" required>
               <option value="1_高">高</option><option value="2_一般">一般</option><option value="3_低">低</option>
             </select>
           </div>
-          <div class="field-item"><label class="pixel-label label-dark-green">實際結案日 (L欄)</label><input type="date" id="input-actual-closed" class="pixel-input date-picker-custom" readonly style="opacity:0.5; background:rgba(255,255,255,0.05);"></div>
+          <div class="field-item"><label class="pixel-label label-dark-green">實際結案日</label><input type="date" id="input-actual-closed" class="pixel-input date-picker-custom" readonly style="opacity:0.5; background:rgba(255,255,255,0.05);"></div>
         </div>
-        <div class="field-grid">
-          <div class="field-item"><label class="pixel-label label-dark-green">任務描述 (J欄)</label><textarea id="input-description" class="pixel-input scroll" rows="8" required></textarea></div>
+        <div class="field-grid" style="margin-top: 10px;">
+          <div class="field-item"><label class="pixel-label label-dark-green">任務描述</label><textarea id="input-description" class="pixel-input scroll" rows="8" required></textarea></div>
           <div class="field-item">
-            <label class="pixel-label label-dark-green">事項紀錄 (K欄) <button type="button" class="mini-plus-btn" onclick="addRecordItem()">[+]</button></label>
-            <div id="records-container" class="scroll" style="height: 180px; overflow-y: auto; border: 2px solid #285428; padding: 10px; background: rgba(0,0,0,0.3);"></div>
+            <label class="pixel-label label-dark-green">事項紀錄 <button type="button" class="mini-plus-btn" onclick="addRecordItem()">[+]</button></label>
+            <div id="records-container" class="scroll" style="height: 200px; overflow-y: auto; border: 2px solid #285428; padding: 10px; background: rgba(0,0,0,0.3);"></div>
           </div>
         </div>
         <div class="field-full">
